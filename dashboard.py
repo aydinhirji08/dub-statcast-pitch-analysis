@@ -109,16 +109,10 @@ with st.expander("Pitch Type Reference", expanded=False):
 
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
-# Load data with live refresh every 5 minutes
-@st.cache_data(ttl=300)
+# Load data from local CSV
+@st.cache_data
 def load_data():
-    try:
-        from pybaseball import statcast
-        df = statcast(start_dt="2026-01-01", end_dt="2026-12-31")
-        return df
-    except Exception as e:
-        st.warning("Could not fetch live data, using cached version")
-        return pd.read_csv('statcast_2026.csv')
+    return pd.read_csv('statcast_2026.csv')
 
 df = load_data()
 
@@ -497,4 +491,4 @@ else:
     st.plotly_chart(fig_pie, use_container_width=True)
     
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #666666;'>MLB Statcast Data | 2026 Season | Live Updates Every 5 Minutes</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #666666;'>MLB Statcast Data | 2026 Season</p>", unsafe_allow_html=True)
