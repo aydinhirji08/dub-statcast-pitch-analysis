@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 import numpy as np
 
 st.set_page_config(page_title="MLB Pitch Analysis", layout="wide")
@@ -13,47 +12,45 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1>MLB STATCAST PITCH ANALYSIS</h1>", unsafe_allow_html=True)
+st.title("MLB STATCAST PITCH ANALYSIS")
 st.markdown("<div style='text-align: center; color: #a0a0a0;'>2026 Season | Advanced Pitcher Analytics</div>", unsafe_allow_html=True)
 
 @st.cache_data
-def load_data():
+def get_data():
     np.random.seed(42)
-    return pd.DataFrame({
-        'player_name': np.random.choice(['Varland, Louis', 'Cole, Gerrit', 'Rodon, Carlos'], 500),
-        'pitch_type': np.random.choice(['FF', 'SL', 'CH', 'CU'], 500),
-        'release_speed': np.random.normal(93, 2.5, 500),
-        'release_spin_rate': np.random.normal(2300, 300, 500),
-        'pfx_x': np.random.normal(0, 10, 500),
-        'pfx_z': np.random.normal(20, 8, 500),
-    })
+    pitchers = ['Varland, Louis', 'Cole, Gerrit', 'Rodon, Carlos']
+    data = []
+    for pitcher in pitchers:
+        for _ in range(150):
+            data.append({
+                'player_name': pitcher,
+                'pitch_type': np.random.choice(['FF', 'SL', 'CH', 'CU']),
+                'release_speed': np.random.normal(93, 2.5),
+                'release_spin_rate': np.random.normal(2300, 300),
+            })
+    return pd.DataFrame(data)
 
-df = load_data()
+df = get_data()
 
 st.sidebar.title("Settings")
-pitcher = st.sidebar.selectbox("Select Pitcher", sorted(df['player_name'].unique()))
+pitcher = st.sidebar.selectbox("Pitcher", sorted(df['player_name'].unique()))
 
-data = df[df['player_name'] == pitcher]
+pitcher_data = df[df['player_name'] == pitcher]
 
 st.subheader(pitcher)
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("Pitches", len(data))
-with col2:
-    st.metric("Avg Velocity", f"{data['release_speed'].mean():.1f} mph")
-with col3:
-    st.metric("Avg Spin Rate", f"{data['release_spin_rate'].mean():.0f} RPM")
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Pitches", len(pitcher_data))
+col2.metric("Avg Velocity", f"{pitcher_data['release_speed'].mean():.1f} mph")
+col3.metric("Avg Spin", f"{pitcher_data['release_spin_rate'].mean():.0f} RPM")
+col4.metric("Pitch Types", pitcher_data['pitch_type'].nunique())
 
-st.markdown("---")
-st.subheader("Pitch Type Distribution")
-pitch_mix = data['pitch_type'].value_counts()
-fig = px.pie(values=pitch_mix.values, names=pitch_mix.index, height=400)
-fig.update_layout(template='plotly_dark', paper_bgcolor='#0f1429')
-st.plotly_chart(fig, use_container_width=True)
+st.divider()
+st.subheader("Pitch Mix")
+pitch_counts = pitcher_data['pitch_type'].value_counts()
+st.bar_chart(pitch_counts)
 
-st.subheader("Velocity vs Spin Rate")
-fig2 = px.scatter(data, x='release_speed', y='release_spin_rate', color='pitch_type', height=400)
-fig2.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429')
-st.plotly_chart(fig2, use_container_width=True)
+st.subheader("Velocity Distribution")
+st.histogram(pitcher_data['release_speed'], bins=20)
 
-st.markdown("<p style='text-align: center; color: #666;'>MLB Statcast | 2026 Season</p>", unsafe_allow_html=True)
+st.divider()
+st.write("Portfolio project by Aydin | MLB Statcast Data 2026")
