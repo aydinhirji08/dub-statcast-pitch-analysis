@@ -50,7 +50,7 @@ pitch_counts = pitcher_data['pitch_type'].value_counts()
 st.bar_chart(pitch_counts)
 
 st.subheader("Velocity Distribution")
-st.histogram(pitcher_data['release_speed'], bins=20)
+st.line_chart(pitcher_data['release_speed'].value_counts().sort_index())
 
 st.divider()
 st.write("Portfolio project by Aydin | MLB Statcast Data 2026")
