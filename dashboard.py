@@ -22,12 +22,20 @@ st.markdown("<h1>MLB STATCAST PITCH ANALYSIS</h1>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center; color: #a0a0a0;'>2026 Season | Advanced Pitcher Analytics</div>", unsafe_allow_html=True)
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
-@st.cache_data
+@st.cache_data(ttl=86400)
 def load_data():
+    try:
+        from pybaseball import statcast
+        df = statcast(start_dt="2026-01-01", end_dt="2026-12-31")
+        if df is not None and len(df) > 0:
+            return df
+    except Exception as e:
+        pass
+    
     try:
         return pd.read_csv('statcast_2026.csv')
     except:
-        st.error("statcast_2026.csv not found")
+        st.error("Could not load data from pybaseball or local CSV")
         return None
 
 df = load_data()
