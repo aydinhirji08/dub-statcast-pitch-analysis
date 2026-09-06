@@ -4,6 +4,8 @@ import plotly.express as px
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+import warnings
+warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="MLB Pitch Analysis System", layout="wide", initial_sidebar_state="expanded")
 
@@ -35,7 +37,7 @@ def load_data():
     try:
         return pd.read_csv('statcast_2026.csv')
     except:
-        st.error("Could not load data from pybaseball or local CSV")
+        st.error("Could not load data. Please refresh the page.")
         return None
 
 df = load_data()
