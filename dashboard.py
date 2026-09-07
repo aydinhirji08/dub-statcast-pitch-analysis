@@ -10,15 +10,52 @@ st.set_page_config(page_title="MLB Pitch Analysis System", layout="wide", initia
 
 st.markdown("""
     <style>
-    body { background-color: #0a0e27; color: #e0e0e0; }
-    .main { background-color: #0a0e27; padding: 20px; }
-    [data-testid="stSidebar"] { background-color: #1a1f3a; }
-    .stMetric { background-color: #1a1f3a; padding: 15px; border-radius: 8px; border: 1px solid #2d3561; }
-    h1 { color: #ffffff; font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 5px; }
-    h2 { color: #e8f4f8; font-size: 1.6rem; font-weight: 600; margin-top: 30px; border-bottom: 2px solid #1f77b4; padding-bottom: 10px; }
-    h3 { color: #b8d4e8; font-size: 1.2rem; }
-    .subtitle { color: #a0a0a0; font-size: 1.1rem; text-align: center; margin-bottom: 20px; }
-    .divider { background-color: #2d3561; height: 1px; margin: 30px 0; }
+    body {
+        background-color: #0a0e27;
+        color: #e0e0e0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .main {
+        background-color: #0a0e27;
+        padding: 20px;
+    }
+    [data-testid="stSidebar"] {
+        background-color: #1a1f3a;
+    }
+    .stMetric {
+        background-color: #1a1f3a;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #2d3561;
+    }
+    h1 {
+        color: #ffffff;
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+    }
+    h2 {
+        color: #e8f4f8;
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-top: 30px;
+        border-bottom: 2px solid #1f77b4;
+        padding-bottom: 10px;
+    }
+    h3 {
+        color: #b8d4e8;
+    }
+    .subtitle {
+        color: #a0a0a0;
+        font-size: 1.1rem;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .divider {
+        background-color: #2d3561;
+        height: 1px;
+        margin: 30px 0;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -26,56 +63,9 @@ st.markdown("<h1>MLB STATCAST PITCH ANALYSIS</h1>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>2026 Season | Advanced Pitcher Analytics</div>", unsafe_allow_html=True)
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
-with st.expander("Pitch Type Reference", expanded=False):
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown("**Fastballs**")
-        st.write("- **FF** = Four-Seam Fastball\n- **SI** = Sinker\n- **FC** = Cut Fastball\n- **FA** = Fastball")
-    with col2:
-        st.markdown("**Breaking Balls**")
-        st.write("- **SL** = Slider\n- **CU** = Curveball\n- **KC** = Knuckle Curve\n- **ST** = Sweeper")
-    with col3:
-        st.markdown("**Off-Speed & Specialty**")
-        st.write("- **CH** = Changeup\n- **FS** = Splitter\n- **SV** = Slurve\n- **KN** = Knuckleball\n- **EP** = Eephus")
-
-st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
-
 @st.cache_data
 def load_data():
-    try:
-        return pd.read_csv('statcast_2026.csv')
-    except:
-        np.random.seed(42)
-        pitchers = ['Varland, Louis', 'Cole, Gerrit', 'Rodon, Carlos', 'Burnes, Corbin', 'Alcantara, Sandy', 
-                    'Musgrove, Joe', 'Snell, Blake', 'Severino, Luis', 'Nola, Aaron', 'Stroman, Marcus',
-                    'Castillo, Luis', 'Kluber, Corey', 'Manaea, Sean', 'Lodolo, Nick', 'Gray, Sonny',
-                    'Cease, Dylan', 'Kopech, Michael', 'McKenzie, Triston', 'Luzardo, Jesus', 'Waldichuk, Eury',
-                    'Thompson, Keegan', 'Montgomery, Mike', 'King, Michael', 'Schmidt, Camilo', 'Flexen, Chris']
-        
-        pitch_types = ['FF', 'SI', 'FC', 'SL', 'CU', 'CH', 'FS', 'ST', 'KC', 'SV']
-        
-        data_list = []
-        for _ in range(5000):
-            pitcher = np.random.choice(pitchers)
-            pitch_type = np.random.choice(pitch_types)
-            data_list.append({
-                'player_name': pitcher,
-                'pitch_type': pitch_type,
-                'release_speed': np.random.normal(93, 2.5),
-                'release_spin_rate': np.random.normal(2300, 300),
-                'pfx_x': np.random.normal(0, 12),
-                'pfx_z': np.random.normal(20, 10),
-                'balls': np.random.randint(0, 4),
-                'strikes': np.random.randint(0, 3),
-                'stand': np.random.choice(['R', 'L']),
-                'events': np.random.choice(['strikeout', 'walk', 'single', 'double', 'triple', 'home_run', None], p=[0.12, 0.08, 0.22, 0.18, 0.05, 0.02, 0.33]),
-                'description': np.random.choice(['swinging_strike', 'called_strike', 'ball', 'foul', 'hit_into_play']),
-                'game_pk': np.random.randint(600000, 700000),
-                'batter': np.random.randint(100000, 900000),
-                'pitcher': np.random.randint(100000, 900000),
-                'inning': np.random.randint(1, 10)
-            })
-        return pd.DataFrame(data_list)
+    return pd.read_csv('statcast_2026.csv')
 
 df = load_data()
 
@@ -91,7 +81,13 @@ def calculate_metrics(data):
     bb_rate = (bb_count / total_ab_count * 100) if total_ab_count > 0 else 0
     whiff_count = len(data[data['description'].str.contains('swinging_strike', case=False, na=False)])
     whiff_rate = (whiff_count / total_pitches * 100) if total_pitches > 0 else 0
-    return {'total_pitches': total_pitches, 'total_atbats': total_ab_count, 'k_rate': k_rate, 'walk_rate': bb_rate, 'whiff_rate': whiff_rate}
+    return {
+        'total_pitches': total_pitches,
+        'total_atbats': total_ab_count,
+        'k_rate': k_rate,
+        'walk_rate': bb_rate,
+        'whiff_rate': whiff_rate
+    }
 
 st.sidebar.markdown("## Analysis Settings")
 all_pitchers = sorted(df['player_name'].dropna().unique())
@@ -103,7 +99,7 @@ if analysis_mode == "Compare Pitchers":
     with col1:
         pitcher_1 = st.selectbox("First Pitcher", all_pitchers, key="p1")
     with col2:
-        pitcher_2 = st.selectbox("Second Pitcher", all_pitchers, key="p2", index=1 if len(all_pitchers) > 1 else 0)
+        pitcher_2 = st.selectbox("Second Pitcher", all_pitchers, key="p2", index=1)
     
     if pitcher_1 == pitcher_2:
         st.warning("Select two different pitchers")
@@ -126,7 +122,6 @@ if analysis_mode == "Compare Pitchers":
         
         st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
         st.markdown("## Velocity & Spin Comparison")
-        
         col1, col2 = st.columns(2)
         with col1:
             vel_data = pd.DataFrame({'Pitcher': [pitcher_1, pitcher_2], 'Velocity': [p1_data['release_speed'].mean(), p2_data['release_speed'].mean()]})
@@ -139,23 +134,37 @@ if analysis_mode == "Compare Pitchers":
             fig_spin.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429')
             st.plotly_chart(fig_spin, use_container_width=True)
         
+        st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+        st.markdown("## Arsenal Comparison")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(f"**{pitcher_1}**")
+            p1_arsenal = p1_data.groupby('pitch_type').agg({'release_speed': 'mean', 'release_spin_rate': 'mean', 'pitch_type': 'count'}).round(1)
+            p1_arsenal.columns = ['Velocity', 'Spin', 'Count']
+            st.dataframe(p1_arsenal.sort_values('Count', ascending=False), use_container_width=True)
+        with col2:
+            st.markdown(f"**{pitcher_2}**")
+            p2_arsenal = p2_data.groupby('pitch_type').agg({'release_speed': 'mean', 'release_spin_rate': 'mean', 'pitch_type': 'count'}).round(1)
+            p2_arsenal.columns = ['Velocity', 'Spin', 'Count']
+            st.dataframe(p2_arsenal.sort_values('Count', ascending=False), use_container_width=True)
+        
+        st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
         st.markdown("## Movement Profile")
         col1, col2 = st.columns(2)
         with col1:
-            p1_sample = p1_data.sample(n=min(2000, len(p1_data)))
+            p1_sample = p1_data.sample(n=min(3000, len(p1_data)))
             fig_p1 = px.scatter(p1_sample, x='pfx_x', y='pfx_z', color='pitch_type', title=f"{pitcher_1} Movement", height=500, labels={'pfx_x': 'Horizontal (in)', 'pfx_z': 'Vertical (in)'}, color_discrete_sequence=px.colors.qualitative.Bold)
             fig_p1.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429')
             st.plotly_chart(fig_p1, use_container_width=True)
         with col2:
-            p2_sample = p2_data.sample(n=min(2000, len(p2_data)))
+            p2_sample = p2_data.sample(n=min(3000, len(p2_data)))
             fig_p2 = px.scatter(p2_sample, x='pfx_x', y='pfx_z', color='pitch_type', title=f"{pitcher_2} Movement", height=500, labels={'pfx_x': 'Horizontal (in)', 'pfx_z': 'Vertical (in)'}, color_discrete_sequence=px.colors.qualitative.Bold)
             fig_p2.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429')
             st.plotly_chart(fig_p2, use_container_width=True)
 
 else:
     selected_pitcher = st.sidebar.selectbox("Pitcher", all_pitchers)
-    all_pitch_types = sorted(df['pitch_type'].dropna().unique().tolist())
-    selected_pitch_types = st.sidebar.multiselect("Pitch Types", all_pitch_types, default=all_pitch_types)
+    selected_pitch_types = st.sidebar.multiselect("Pitch Types", df['pitch_type'].unique(), default=['FF', 'SL', 'CH'])
     batter_hand = st.sidebar.radio("Batter", ["All", "Right (RHH)", "Left (LHH)"])
     count_option = st.sidebar.radio("Count", ["All", "Specific"])
     
@@ -170,13 +179,13 @@ else:
     if count_option == "Specific":
         filtered_df['count'] = filtered_df['balls'].astype(str) + '-' + filtered_df['strikes'].astype(str)
         unique_counts = sorted(filtered_df['count'].unique())
-        if len(unique_counts) > 0:
-            selected_count = st.sidebar.selectbox("Select Count", unique_counts)
-            filtered_df = filtered_df[filtered_df['count'] == selected_count]
+        selected_count = st.sidebar.selectbox("Select Count", unique_counts)
+        filtered_df = filtered_df[filtered_df['count'] == selected_count]
     
     league_df = df[df['pitch_type'].isin(selected_pitch_types)]
     
     st.markdown(f"<h2>{selected_pitcher}</h2>", unsafe_allow_html=True)
+    
     pitcher_metrics = calculate_metrics(filtered_df)
     
     col1, col2, col3, col4 = st.columns(4)
@@ -190,51 +199,94 @@ else:
         st.metric("Whiff Rate", f"{pitcher_metrics['whiff_rate']:.1f}%")
     
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+    
     st.markdown("## Pitch Prediction")
     
     @st.cache_resource
     def train_predictor(pitcher_name):
-        pitcher_data = df[df['player_name'] == pitcher_name].dropna(subset=['release_speed', 'pitch_type', 'balls', 'strikes', 'stand'])
+        pitcher_data = df[df['player_name'] == pitcher_name].copy()
         if len(pitcher_data) < 50:
             return None
-        pitcher_data = pitcher_data.copy()
-        pitcher_data['count'] = pitcher_data['balls'].astype(str) + '-' + pitcher_data['strikes'].astype(str)
-        le_count = LabelEncoder()
-        pitcher_data['count_encoded'] = le_count.fit_transform(pitcher_data['count'])
-        le_stand = LabelEncoder()
-        pitcher_data['stand_encoded'] = le_stand.fit_transform(pitcher_data['stand'])
-        X = np.array(pitcher_data[['release_speed', 'count_encoded', 'stand_encoded']])
-        y = np.array(pitcher_data['pitch_type'])
-        model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=8, min_samples_split=10)
-        model.fit(X, y)
-        return {'model': model, 'le_count': le_count, 'le_stand': le_stand}
+        
+        try:
+            pitcher_data_full = pitcher_data.dropna(subset=['release_speed', 'pitch_type', 'balls', 'strikes', 'stand', 'outs_when_up'])
+            if len(pitcher_data_full) < 50:
+                pitcher_data_full = pitcher_data.dropna(subset=['release_speed', 'pitch_type', 'balls', 'strikes', 'stand'])
+            
+            if len(pitcher_data_full) < 50:
+                return None
+            
+            pitcher_data_full['count'] = pitcher_data_full['balls'].astype(str) + '-' + pitcher_data_full['strikes'].astype(str)
+            
+            pitcher_data_full['men_on_base'] = (pitcher_data_full['on_1b'].fillna(0) + pitcher_data_full['on_2b'].fillna(0) + pitcher_data_full['on_3b'].fillna(0)).astype(int)
+            pitcher_data_full['risp'] = ((pitcher_data_full['on_2b'].fillna(0) > 0) | (pitcher_data_full['on_3b'].fillna(0) > 0)).astype(int)
+            
+            le_count = LabelEncoder()
+            pitcher_data_full['count_encoded'] = le_count.fit_transform(pitcher_data_full['count'])
+            le_stand = LabelEncoder()
+            pitcher_data_full['stand_encoded'] = le_stand.fit_transform(pitcher_data_full['stand'])
+            
+            X = np.array(pitcher_data_full[['release_speed', 'count_encoded', 'stand_encoded', 'outs_when_up', 'men_on_base', 'risp']])
+            y = np.array(pitcher_data_full['pitch_type'])
+            
+            model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=8, min_samples_split=10)
+            model.fit(X, y)
+            return {'model': model, 'le_count': le_count, 'le_stand': le_stand}
+        except:
+            return None
     
     predictor = train_predictor(selected_pitcher)
+    
     if predictor:
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
+        
         with col1:
+            st.markdown("**Game Situation**")
             all_pitcher_data = df[df['player_name'] == selected_pitcher].copy()
             all_pitcher_data['count'] = all_pitcher_data['balls'].astype(str) + '-' + all_pitcher_data['strikes'].astype(str)
             unique_counts = sorted(all_pitcher_data['count'].unique())
+            
             pred_count = st.selectbox("Count", unique_counts, key="pred_count")
             pred_vel = st.slider("Velocity (mph)", 70, 105, 95, key="pred_vel")
             pred_hand = st.radio("Batter", ["Right", "Left"], key="pred_hand")
+        
         with col2:
-            if st.button("Predict"):
-                count_enc = predictor['le_count'].transform([pred_count])[0]
-                stand_enc = predictor['le_stand'].transform(['R' if pred_hand == "Right" else 'L'])[0]
-                pred_input = np.array([[pred_vel, count_enc, stand_enc]])
-                pred_pitch = predictor['model'].predict(pred_input)[0]
-                pred_proba = predictor['model'].predict_proba(pred_input)[0]
-                st.markdown(f"### **{pred_pitch}**")
-                st.markdown(f"Confidence: {pred_proba.max() * 100:.1f}%")
+            st.markdown("**Baserunning**")
+            pred_outs = st.selectbox("Outs", [0, 1, 2], key="pred_outs")
+            pred_risp = st.checkbox("Runner in Scoring Position", key="pred_risp")
+            pred_men_on = st.slider("Men on Base", 0, 3, 0, key="pred_men_on")
+        
+        with col3:
+            st.markdown("**Prediction**")
+            if st.button("Predict Pitch"):
+                try:
+                    count_enc = predictor['le_count'].transform([pred_count])[0]
+                    stand_enc = predictor['le_stand'].transform(['R' if pred_hand == "Right" else 'L'])[0]
+                    risp_enc = 1 if pred_risp else 0
+                    
+                    pred_input = np.array([[pred_vel, count_enc, stand_enc, pred_outs, pred_men_on, risp_enc]])
+                    
+                    pred_pitch = predictor['model'].predict(pred_input)[0]
+                    pred_proba = predictor['model'].predict_proba(pred_input)[0]
+                    
+                    st.markdown(f"### **{pred_pitch}**")
+                    st.markdown(f"Confidence: {pred_proba.max() * 100:.1f}%")
+                    
+                    st.markdown("---")
+                    st.markdown(f"**Count:** {pred_count} | **Outs:** {pred_outs} | **Men on:** {pred_men_on} | **RISP:** {'Yes' if pred_risp else 'No'}")
+                except Exception as e:
+                    st.error(f"Error: {str(e)}")
+    else:
+        st.warning("Not enough data to train pitch predictor for this pitcher")
     
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+    
     st.markdown("## vs League Average")
+    
     col1, col2, col3 = st.columns(3)
+    league_metrics = calculate_metrics(league_df)
     
     with col1:
-        league_metrics = calculate_metrics(league_df)
         k_data = pd.DataFrame({'Pitcher': [selected_pitcher, 'League'], 'K Rate': [pitcher_metrics['k_rate'], league_metrics['k_rate']]})
         fig_k = px.bar(k_data, x='Pitcher', y='K Rate', color='K Rate', color_continuous_scale='Blues', height=400)
         fig_k.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429', showlegend=False)
@@ -253,12 +305,15 @@ else:
         st.plotly_chart(fig_whiff, use_container_width=True)
     
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+    
     st.markdown("## Arsenal")
+    
     arsenal = filtered_df.groupby('pitch_type').agg({'release_speed': 'mean', 'release_spin_rate': 'mean', 'pitch_type': 'count'}).round(1)
     arsenal.columns = ['Velocity', 'Spin', 'Count']
     st.dataframe(arsenal.sort_values('Count', ascending=False), use_container_width=True)
     
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+    
     st.markdown("## Velocity by Count")
     
     pitcher_all = df[(df['player_name'] == selected_pitcher) & (df['pitch_type'].isin(selected_pitch_types))]
@@ -268,33 +323,37 @@ else:
     count_stats.columns = ['Avg Velocity', 'Pitch Count', 'Avg Spin Rate']
     count_stats = count_stats.sort_values('Pitch Count', ascending=False)
     
+    st.markdown("**Velocity and Spin by Count**")
     st.dataframe(count_stats, use_container_width=True)
     
     count_vel = pitcher_all.groupby('count')['release_speed'].mean().sort_values(ascending=False)
     if len(count_vel) > 0:
-        fig_count = px.bar(count_vel, labels={'value': 'Avg Velocity (mph)', 'count': 'Count'}, color=count_vel.values, color_continuous_scale='Reds', height=400)
-        fig_count.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429', showlegend=False)
-        st.plotly_chart(fig_count, use_container_width=True)
+        fig_count_vel = px.bar(count_vel, labels={'value': 'Avg Velocity (mph)', 'count': 'Count'}, color=count_vel.values, color_continuous_scale='Blues', height=400)
+        fig_count_vel.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429')
+        st.plotly_chart(fig_count_vel, use_container_width=True)
     
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+    
     st.markdown("## Analysis")
     
     col1, col2 = st.columns(2)
-    with col1:
-        vel_by_type = filtered_df.groupby('pitch_type')['release_speed'].mean().sort_values(ascending=False)
-        fig_vel = px.bar(vel_by_type, color=vel_by_type.values, color_continuous_scale='Reds', height=400, labels={'value': 'Velocity (mph)'})
-        fig_vel.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429', showlegend=False)
-        st.plotly_chart(fig_vel, use_container_width=True)
     
-    with col2:
+    with col1:
         spin_by_type = filtered_df.groupby('pitch_type')['release_spin_rate'].mean().sort_values(ascending=False)
         fig_spin = px.bar(spin_by_type, color=spin_by_type.values, color_continuous_scale='Blues', height=400, labels={'value': 'Spin Rate (RPM)'})
         fig_spin.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429', showlegend=False)
         st.plotly_chart(fig_spin, use_container_width=True)
     
+    with col2:
+        vel_by_type = filtered_df.groupby('pitch_type')['release_speed'].mean().sort_values(ascending=False)
+        fig_vel = px.bar(vel_by_type, color=vel_by_type.values, color_continuous_scale='Reds', height=400, labels={'value': 'Velocity (mph)'})
+        fig_vel.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429', showlegend=False)
+        st.plotly_chart(fig_vel, use_container_width=True)
+    
     col1, col2 = st.columns(2)
+    
     with col1:
-        sample = filtered_df.sample(n=min(3000, len(filtered_df)))
+        sample = filtered_df.sample(n=min(5000, len(filtered_df)))
         fig_mech = px.scatter(sample, x='release_speed', y='release_spin_rate', color='pitch_type', height=500, labels={'release_speed': 'Velocity (mph)', 'release_spin_rate': 'Spin Rate (RPM)'}, color_discrete_sequence=px.colors.qualitative.Bold)
         fig_mech.update_layout(template='plotly_dark', paper_bgcolor='#0f1429', plot_bgcolor='#0f1429')
         st.plotly_chart(fig_mech, use_container_width=True)
@@ -308,6 +367,6 @@ else:
     fig_pie = px.pie(values=pitch_mix.values, names=pitch_mix.index, height=500)
     fig_pie.update_layout(template='plotly_dark', paper_bgcolor='#0f1429')
     st.plotly_chart(fig_pie, use_container_width=True)
-
-st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #666666;'>MLB Statcast Data | 2026 Season</p>", unsafe_allow_html=True)
+    
+    st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #666666;'>MLB Statcast Data | 2026 Season</p>", unsafe_allow_html=True)
