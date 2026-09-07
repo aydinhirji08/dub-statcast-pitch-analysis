@@ -1,4 +1,5 @@
 import streamlit as st
+# Version 1.1 - Updated deployment
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
