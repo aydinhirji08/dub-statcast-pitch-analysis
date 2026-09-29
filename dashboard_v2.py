@@ -12,6 +12,7 @@ warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="MLB Statcast Pitch Analysis", layout="wide", initial_sidebar_state="expanded")
 
+# Professional MLB Analytics Theme
 st.markdown("""
 <style>
     :root {
@@ -92,6 +93,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 st.divider()
 
+# SIDEBAR FILTERS
 st.sidebar.markdown("""
 <div style="margin-bottom: 1.5rem;">
     <h3 style="margin: 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 1px; color: #a0aec0;">🎯 Filters</h3>
@@ -126,6 +128,7 @@ else:
     selected_balls = (0, 3)
     selected_strikes = (0, 2)
 
+# DATA FILTERING
 filtered_df = df[
     (df['pitcher_name'] == selected_pitcher) &
     (df['pitch_type'].isin(selected_pitches)) &
@@ -177,6 +180,7 @@ if compare_pitchers and pitcher_2:
 else:
     filtered_df_pitcher2 = None
 
+# MAIN STRIKE ZONE
 col1, col2 = st.columns([2, 1])
 
 with col1:
@@ -299,6 +303,7 @@ with col2:
 
 st.divider()
 
+# ANALYSIS SECTION
 st.markdown("""
 <div style="margin: 2rem 0 1.5rem 0;">
     <h2 style="margin: 0; font-size: 1.25rem; color: #e2e8f0;">Analysis</h2>
@@ -316,24 +321,8 @@ with col1:
     
     vel_df = filtered_df_with_hand[filtered_df_with_hand['release_speed'] > 0]
     if len(vel_df) > 0 and len(vel_df['pitch_type'].unique()) > 0:
-        fig_vel = px.box(
-            vel_df,
-            x='pitch_type',
-            y='release_speed',
-            color='pitch_type',
-            title='',
-            labels={'release_speed': 'Velocity (mph)', 'pitch_type': 'Pitch Type'}
-        )
-        fig_vel.update_layout(
-            template="plotly_dark", 
-            height=400, 
-            showlegend=False,
-            plot_bgcolor='#111827',
-            paper_bgcolor='#0a0e17',
-            font=dict(family='system-ui', size=11, color='#e2e8f0'),
-            xaxis=dict(gridcolor='#1a202c', zeroline=False),
-            yaxis=dict(gridcolor='#1a202c', zeroline=False)
-        )
+        fig_vel = px.box(vel_df, x='pitch_type', y='release_speed', color='pitch_type', title='', labels={'release_speed': 'Velocity (mph)', 'pitch_type': 'Pitch Type'})
+        fig_vel.update_layout(template="plotly_dark", height=400, showlegend=False, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(family='system-ui', size=11, color='#e2e8f0'), xaxis=dict(gridcolor='#1a202c', zeroline=False), yaxis=dict(gridcolor='#1a202c', zeroline=False))
         st.plotly_chart(fig_vel, width='stretch', key="vel_distribution")
     else:
         st.info("No velocity data available for selected filters")
@@ -347,30 +336,15 @@ with col2:
     
     spin_df = filtered_df_with_hand[filtered_df_with_hand['release_spin_rate'] > 0]
     if len(spin_df) > 0 and len(spin_df['pitch_type'].unique()) > 0:
-        fig_spin = px.box(
-            spin_df,
-            x='pitch_type',
-            y='release_spin_rate',
-            color='pitch_type',
-            title='',
-            labels={'release_spin_rate': 'Spin Rate (rpm)', 'pitch_type': 'Pitch Type'}
-        )
-        fig_spin.update_layout(
-            template="plotly_dark", 
-            height=400, 
-            showlegend=False,
-            plot_bgcolor='#111827',
-            paper_bgcolor='#0a0e17',
-            font=dict(family='system-ui', size=11, color='#e2e8f0'),
-            xaxis=dict(gridcolor='#1a202c', zeroline=False),
-            yaxis=dict(gridcolor='#1a202c', zeroline=False)
-        )
+        fig_spin = px.box(spin_df, x='pitch_type', y='release_spin_rate', color='pitch_type', title='', labels={'release_spin_rate': 'Spin Rate (rpm)', 'pitch_type': 'Pitch Type'})
+        fig_spin.update_layout(template="plotly_dark", height=400, showlegend=False, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(family='system-ui', size=11, color='#e2e8f0'), xaxis=dict(gridcolor='#1a202c', zeroline=False), yaxis=dict(gridcolor='#1a202c', zeroline=False))
         st.plotly_chart(fig_spin, width='stretch', key="spin_distribution")
     else:
         st.info("No spin rate data available for selected filters")
 
 st.divider()
 
+# PITCH MOVEMENT
 st.markdown("""
 <div style="margin: 2rem 0 1.5rem 0;">
     <h2 style="margin: 0; font-size: 1.25rem; color: #e2e8f0;">Pitch Movement</h2>
@@ -388,24 +362,8 @@ with col1:
     
     move_df = filtered_df_with_hand[(filtered_df_with_hand['pfx_x'].notna()) & (filtered_df_with_hand['pfx_z'].notna())]
     if len(move_df) > 0:
-        fig_move = px.scatter(
-            move_df,
-            x='pfx_x',
-            y='pfx_z',
-            color='pitch_type',
-            title='',
-            labels={'pfx_x': 'Horizontal Break (in)', 'pfx_z': 'Induced Vertical Break (in)'},
-            hover_data=['release_speed', 'release_spin_rate']
-        )
-        fig_move.update_layout(
-            template="plotly_dark", 
-            height=500,
-            plot_bgcolor='#111827',
-            paper_bgcolor='#0a0e17',
-            font=dict(family='system-ui', size=11, color='#e2e8f0'),
-            xaxis=dict(gridcolor='#1a202c', zeroline=True, zerolinecolor='#2d3748'),
-            yaxis=dict(gridcolor='#1a202c', zeroline=True, zerolinecolor='#2d3748')
-        )
+        fig_move = px.scatter(move_df, x='pfx_x', y='pfx_z', color='pitch_type', title='', labels={'pfx_x': 'Horizontal Break (in)', 'pfx_z': 'Induced Vertical Break (in)'}, hover_data=['release_speed', 'release_spin_rate'])
+        fig_move.update_layout(template="plotly_dark", height=500, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(family='system-ui', size=11, color='#e2e8f0'), xaxis=dict(gridcolor='#1a202c', zeroline=True, zerolinecolor='#2d3748'), yaxis=dict(gridcolor='#1a202c', zeroline=True, zerolinecolor='#2d3748'))
         fig_move.update_xaxes(zeroline=True)
         fig_move.update_yaxes(zeroline=True)
         st.plotly_chart(fig_move, width='stretch', key="movement_scatter")
@@ -421,29 +379,15 @@ with col2:
     
     vel_type_df = filtered_df_with_hand[filtered_df_with_hand['release_speed'] > 0]
     if len(vel_type_df) > 0 and len(vel_type_df['pitch_type'].unique()) > 0:
-        fig_vel_type = px.violin(
-            vel_type_df,
-            x='pitch_type',
-            y='release_speed',
-            color='pitch_type',
-            title=''
-        )
-        fig_vel_type.update_layout(
-            template="plotly_dark", 
-            height=500, 
-            showlegend=False,
-            plot_bgcolor='#111827',
-            paper_bgcolor='#0a0e17',
-            font=dict(family='system-ui', size=11, color='#e2e8f0'),
-            xaxis=dict(gridcolor='#1a202c', zeroline=False),
-            yaxis=dict(gridcolor='#1a202c', zeroline=False)
-        )
+        fig_vel_type = px.violin(vel_type_df, x='pitch_type', y='release_speed', color='pitch_type', title='')
+        fig_vel_type.update_layout(template="plotly_dark", height=500, showlegend=False, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(family='system-ui', size=11, color='#e2e8f0'), xaxis=dict(gridcolor='#1a202c', zeroline=False), yaxis=dict(gridcolor='#1a202c', zeroline=False))
         st.plotly_chart(fig_vel_type, width='stretch', key="velocity_violin")
     else:
         st.info("No velocity data available for selected filters")
 
 st.divider()
 
+# PITCH CONTEXT
 st.markdown("""
 <div style="margin: 2rem 0 1.5rem 0;">
     <h2 style="margin: 0; font-size: 1.25rem; color: #e2e8f0;">Pitch Context</h2>
@@ -463,23 +407,8 @@ with col1:
     vel_count_df['count'] = vel_count_df['balls'].astype(str) + '-' + vel_count_df['strikes'].astype(str)
     
     if len(vel_count_df) > 0:
-        fig_vel_count = px.box(
-            vel_count_df,
-            x='count',
-            y='release_speed',
-            color='count',
-            title=''
-        )
-        fig_vel_count.update_layout(
-            template="plotly_dark", 
-            height=400, 
-            showlegend=False,
-            plot_bgcolor='#111827',
-            paper_bgcolor='#0a0e17',
-            font=dict(family='system-ui', size=11, color='#e2e8f0'),
-            xaxis=dict(gridcolor='#1a202c', zeroline=False),
-            yaxis=dict(gridcolor='#1a202c', zeroline=False)
-        )
+        fig_vel_count = px.box(vel_count_df, x='count', y='release_speed', color='count', title='')
+        fig_vel_count.update_layout(template="plotly_dark", height=400, showlegend=False, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(family='system-ui', size=11, color='#e2e8f0'), xaxis=dict(gridcolor='#1a202c', zeroline=False), yaxis=dict(gridcolor='#1a202c', zeroline=False))
         st.plotly_chart(fig_vel_count, width='stretch', key="vel_by_count")
     else:
         st.info("No velocity data available for selected filters")
@@ -496,24 +425,15 @@ with col2:
     pitch_dist_pitcher.columns = ['Pitch Type', 'Count']
     
     if len(pitch_dist_pitcher) > 0:
-        fig_pitch = px.pie(
-            pitch_dist_pitcher,
-            values='Count',
-            names='Pitch Type',
-            title=''
-        )
-        fig_pitch.update_layout(
-            template="plotly_dark",
-            plot_bgcolor='#111827',
-            paper_bgcolor='#0a0e17',
-            font=dict(family='system-ui', size=11, color='#e2e8f0')
-        )
+        fig_pitch = px.pie(pitch_dist_pitcher, values='Count', names='Pitch Type', title='')
+        fig_pitch.update_layout(template="plotly_dark", plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(family='system-ui', size=11, color='#e2e8f0'))
         st.plotly_chart(fig_pitch, width='stretch', key="pitch_distribution")
     else:
         st.info("No pitch data available for selected filters")
 
 st.divider()
 
+# COMPARISON PITCHERS
 if compare_pitchers and pitcher_2 and filtered_df_pitcher2 is not None and len(filtered_df_pitcher2) > 0:
     st.markdown(f"""
     <div style="margin: 2rem 0 1.5rem 0;">
@@ -523,6 +443,7 @@ if compare_pitchers and pitcher_2 and filtered_df_pitcher2 is not None and len(f
     """, unsafe_allow_html=True)
     st.divider()
 
+    # COMPARISON STRIKE ZONES
     st.markdown("""
     <div style="margin-bottom: 1.5rem;">
         <h3 style="margin: 0; font-size: 1.125rem; color: #e2e8f0;">Strike Zones</h3>
@@ -536,38 +457,9 @@ if compare_pitchers and pitcher_2 and filtered_df_pitcher2 is not None and len(f
         
         fig_heatmap1 = go.Figure()
         if len(filtered_df_with_hand) > 0:
-            fig_heatmap1.add_trace(go.Histogram2d(
-                x=filtered_df_with_hand['plate_x'],
-                y=filtered_df_with_hand['plate_z'],
-                nbinsx=20,
-                nbinsy=20,
-                colorscale='Blues',
-                colorbar=dict(title="Pitch Count"),
-            ))
-        
-        fig_heatmap1.add_shape(
-            type="rect",
-            x0=-0.83, y0=1.6,
-            x1=0.83, y1=3.5,
-            line=dict(color="black", width=2),
-            fillcolor="rgba(0,0,0,0)"
-        )
-        
-        fig_heatmap1.update_layout(
-            title="",
-            xaxis_title="Horizontal Location",
-            yaxis_title="Vertical Location",
-            height=500,
-            template="plotly",
-            plot_bgcolor='white',
-            paper_bgcolor='white',
-            font=dict(family='system-ui', size=11, color='#1a202c'),
-            xaxis=dict(gridcolor='#e0e0e0', zeroline=False),
-            yaxis=dict(gridcolor='#e0e0e0', zeroline=False)
-        )
-        fig_heatmap1.update_xaxes(range=[-3, 3], showgrid=False)
-        fig_heatmap1.update_yaxes(range=[0, 5], showgrid=False)
-        
+            fig_heatmap1.add_trace(go.Histogram2d(x=filtered_df_with_hand['plate_x'], y=filtered_df_with_hand['plate_z'], nbinsx=20, nbinsy=20, colorscale='Blues', colorbar=dict(title="Pitch Count")))
+        fig_heatmap1.add_shape(type="rect", x0=-0.83, y0=1.6, x1=0.83, y1=3.5, line=dict(color="black", width=2), fillcolor="rgba(0,0,0,0)")
+        fig_heatmap1.update_layout(height=500, template="plotly", plot_bgcolor='white', paper_bgcolor='white', font=dict(family='system-ui', size=11, color='#1a202c'), xaxis=dict(gridcolor='#e0e0e0', zeroline=False, range=[-3, 3]), yaxis=dict(gridcolor='#e0e0e0', zeroline=False, range=[0, 5]))
         st.plotly_chart(fig_heatmap1, width='stretch', key="comp_heatmap1")
     
     with col2:
@@ -575,39 +467,60 @@ if compare_pitchers and pitcher_2 and filtered_df_pitcher2 is not None and len(f
         
         fig_heatmap2 = go.Figure()
         if len(filtered_df_pitcher2) > 0:
-            fig_heatmap2.add_trace(go.Histogram2d(
-                x=filtered_df_pitcher2['plate_x'],
-                y=filtered_df_pitcher2['plate_z'],
-                nbinsx=20,
-                nbinsy=20,
-                colorscale='Reds',
-                colorbar=dict(title="Pitch Count"),
-            ))
-        
-        fig_heatmap2.add_shape(
-            type="rect",
-            x0=-0.83, y0=1.6,
-            x1=0.83, y1=3.5,
-            line=dict(color="black", width=2),
-            fillcolor="rgba(0,0,0,0)"
-        )
-        
-        fig_heatmap2.update_layout(
-            title="",
-            xaxis_title="Horizontal Location",
-            yaxis_title="Vertical Location",
-            height=500,
-            template="plotly",
-            plot_bgcolor='white',
-            paper_bgcolor='white',
-            font=dict(family='system-ui', size=11, color='#1a202c'),
-            xaxis=dict(gridcolor='#e0e0e0', zeroline=False),
-            yaxis=dict(gridcolor='#e0e0e0', zeroline=False)
-        )
-        fig_heatmap2.update_xaxes(range=[-3, 3], showgrid=False)
-        fig_heatmap2.update_yaxes(range=[0, 5], showgrid=False)
-        
+            fig_heatmap2.add_trace(go.Histogram2d(x=filtered_df_pitcher2['plate_x'], y=filtered_df_pitcher2['plate_z'], nbinsx=20, nbinsy=20, colorscale='Reds', colorbar=dict(title="Pitch Count")))
+        fig_heatmap2.add_shape(type="rect", x0=-0.83, y0=1.6, x1=0.83, y1=3.5, line=dict(color="black", width=2), fillcolor="rgba(0,0,0,0)")
+        fig_heatmap2.update_layout(height=500, template="plotly", plot_bgcolor='white', paper_bgcolor='white', font=dict(family='system-ui', size=11, color='#1a202c'), xaxis=dict(gridcolor='#e0e0e0', zeroline=False, range=[-3, 3]), yaxis=dict(gridcolor='#e0e0e0', zeroline=False, range=[0, 5]))
         st.plotly_chart(fig_heatmap2, width='stretch', key="comp_heatmap2")
+    
+    st.divider()
+
+    # COMPARISON VELOCITY
+    st.markdown("""
+    <div style="margin: 2rem 0 1.5rem 0;">
+        <h2 style="margin: 0; font-size: 1.25rem; color: #e2e8f0;">Velocity Comparison</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        vel_p1 = filtered_df_with_hand[filtered_df_with_hand['release_speed'] > 0]
+        if len(vel_p1) > 0 and len(vel_p1['pitch_type'].unique()) > 0:
+            fig_vel1 = px.box(vel_p1, x='pitch_type', y='release_speed', color='pitch_type', title=f'{selected_pitcher}')
+            fig_vel1.update_layout(template="plotly_dark", height=400, showlegend=False, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(size=11, color='#e2e8f0'))
+            st.plotly_chart(fig_vel1, width='stretch', key="comp_vel1")
+    
+    with col2:
+        vel_p2 = filtered_df_pitcher2[filtered_df_pitcher2['release_speed'] > 0]
+        if len(vel_p2) > 0 and len(vel_p2['pitch_type'].unique()) > 0:
+            fig_vel2 = px.box(vel_p2, x='pitch_type', y='release_speed', color='pitch_type', title=f'{pitcher_2}')
+            fig_vel2.update_layout(template="plotly_dark", height=400, showlegend=False, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(size=11, color='#e2e8f0'))
+            st.plotly_chart(fig_vel2, width='stretch', key="comp_vel2")
+    
+    st.divider()
+
+    # COMPARISON SPIN RATE
+    st.markdown("""
+    <div style="margin: 2rem 0 1.5rem 0;">
+        <h2 style="margin: 0; font-size: 1.25rem; color: #e2e8f0;">Spin Rate Comparison</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        spin_p1 = filtered_df_with_hand[filtered_df_with_hand['release_spin_rate'] > 0]
+        if len(spin_p1) > 0 and len(spin_p1['pitch_type'].unique()) > 0:
+            fig_spin1 = px.box(spin_p1, x='pitch_type', y='release_spin_rate', color='pitch_type', title=f'{selected_pitcher}')
+            fig_spin1.update_layout(template="plotly_dark", height=400, showlegend=False, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(size=11, color='#e2e8f0'))
+            st.plotly_chart(fig_spin1, width='stretch', key="comp_spin1")
+    
+    with col2:
+        spin_p2 = filtered_df_pitcher2[filtered_df_pitcher2['release_spin_rate'] > 0]
+        if len(spin_p2) > 0 and len(spin_p2['pitch_type'].unique()) > 0:
+            fig_spin2 = px.box(spin_p2, x='pitch_type', y='release_spin_rate', color='pitch_type', title=f'{pitcher_2}')
+            fig_spin2.update_layout(template="plotly_dark", height=400, showlegend=False, plot_bgcolor='#111827', paper_bgcolor='#0a0e17', font=dict(size=11, color='#e2e8f0'))
+            st.plotly_chart(fig_spin2, width='stretch', key="comp_spin2")
     
     st.divider()
 
