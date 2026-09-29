@@ -217,7 +217,9 @@ def load_data():
     batter_map = dict(zip(batter_names['batter_id'], batter_names['batter_name']))
     
     # Clean and prepare data
-    df['batter_name'] = df['batter'].apply(lambda x: batter_map.get(int(x), 'Unknown') if pd.notna(x) else 'Unknown')
+    # Handle both 'batter' and 'batter_id' column names
+    batter_col = 'batter' if 'batter' in df.columns else 'batter_id'
+    df['batter_name'] = df[batter_col].apply(lambda x: batter_map.get(int(x), 'Unknown') if pd.notna(x) else 'Unknown')
     df['pitcher_name'] = df['player_name'].fillna('Unknown')
     df['game_date'] = pd.to_datetime(df['game_date'])
     
