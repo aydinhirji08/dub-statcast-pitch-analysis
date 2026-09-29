@@ -204,11 +204,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Load data
+# Load data from Google Drive
 @st.cache_data
 def load_data():
-    df = pd.read_csv('statcast_2026.csv')
-    batter_names = pd.read_csv('batter_names.csv')
+    # Google Drive FILE IDs
+    statcast_id = "1jxHScV07VtIvLjqZrct5zBJQYDnBwYKj"
+    batter_id = "15sCrSvg_b1_pW8piY6PNhoCpBhs529ra"
+    
+    # Fetch from Google Drive
+    df = pd.read_csv(f"https://drive.google.com/uc?id={statcast_id}")
+    batter_names = pd.read_csv(f"https://drive.google.com/uc?id={batter_id}")
     batter_map = dict(zip(batter_names['batter_id'], batter_names['batter_name']))
     
     # Clean and prepare data
@@ -410,18 +415,18 @@ with col1:
     
     # Update layout
     fig_heatmap.update_layout(
-        title=dict(text="Pitches Thrown", x=0, xanchor='left', font=dict(size=14, color='#e2e8f0')),
+        title=dict(text="Pitches Thrown", x=0, xanchor='left', font=dict(size=14, color='#1a202c')),
         xaxis_title="Horizontal Location (ft)",
         yaxis_title="Vertical Location (ft)",
         width=700,
         height=600,
-        template="plotly_dark",
+        template="plotly",
         hovermode='closest',
-        plot_bgcolor='#111827',
-        paper_bgcolor='#0a0e17',
-        font=dict(family='system-ui, -apple-system, sans-serif', size=11, color='#e2e8f0'),
-        xaxis=dict(gridcolor='#1a202c', zeroline=False),
-        yaxis=dict(gridcolor='#1a202c', zeroline=False)
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='system-ui, -apple-system, sans-serif', size=11, color='#1a202c'),
+        xaxis=dict(gridcolor='#e0e0e0', zeroline=False),
+        yaxis=dict(gridcolor='#e0e0e0', zeroline=False)
     )
     fig_heatmap.update_xaxes(range=[-3, 3], showgrid=False)
     fig_heatmap.update_yaxes(range=[0, 5], showgrid=False)
@@ -735,7 +740,7 @@ if compare_pitchers and pitcher_2 and filtered_df_pitcher2 is not None:
     </div>
     """, unsafe_allow_html=True)
     st.divider()
-    
+
     # STRIKE ZONES
     st.markdown("""
     <div style="margin-bottom: 1.5rem;">
@@ -772,12 +777,12 @@ if compare_pitchers and pitcher_2 and filtered_df_pitcher2 is not None:
             xaxis_title="Horizontal Location",
             yaxis_title="Vertical Location",
             height=500,
-            template="plotly_dark",
-            plot_bgcolor='#111827',
-            paper_bgcolor='#0a0e17',
-            font=dict(family='system-ui', size=11, color='#e2e8f0'),
-            xaxis=dict(gridcolor='#1a202c', zeroline=False),
-            yaxis=dict(gridcolor='#1a202c', zeroline=False)
+            template="plotly",
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            font=dict(family='system-ui', size=11, color='#1a202c'),
+            xaxis=dict(gridcolor='#e0e0e0', zeroline=False),
+            yaxis=dict(gridcolor='#e0e0e0', zeroline=False)
         )
         fig_heatmap1.update_xaxes(range=[-3, 3], showgrid=False)
         fig_heatmap1.update_yaxes(range=[0, 5], showgrid=False)
@@ -811,186 +816,17 @@ if compare_pitchers and pitcher_2 and filtered_df_pitcher2 is not None:
             xaxis_title="Horizontal Location",
             yaxis_title="Vertical Location",
             height=500,
-            template="plotly_dark",
-            plot_bgcolor='#111827',
-            paper_bgcolor='#0a0e17',
-            font=dict(family='system-ui', size=11, color='#e2e8f0'),
-            xaxis=dict(gridcolor='#1a202c', zeroline=False),
-            yaxis=dict(gridcolor='#1a202c', zeroline=False)
+            template="plotly",
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            font=dict(family='system-ui', size=11, color='#1a202c'),
+            xaxis=dict(gridcolor='#e0e0e0', zeroline=False),
+            yaxis=dict(gridcolor='#e0e0e0', zeroline=False)
         )
         fig_heatmap2.update_xaxes(range=[-3, 3], showgrid=False)
         fig_heatmap2.update_yaxes(range=[0, 5], showgrid=False)
         
         st.plotly_chart(fig_heatmap2, use_container_width=True, key="comp_heatmap2")
-    
-    st.divider()
-    
-    # VELOCITY BY COUNT
-    st.markdown("""
-    <div style="margin: 1.5rem 0 1.5rem 0;">
-        <h3 style="margin: 0; font-size: 1.125rem; color: #e2e8f0;">Velocity by Count</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown(f'<div style="margin-bottom: 0.75rem; color: #e2e8f0; font-weight: 600;">{selected_pitcher}</div>', unsafe_allow_html=True)
-        vel_count1 = filtered_df_with_hand[filtered_df_with_hand['release_speed'] > 0].copy()
-        vel_count1['count'] = vel_count1['balls'].astype(str) + '-' + vel_count1['strikes'].astype(str)
-        
-        if len(vel_count1) > 0:
-            fig_vc1 = px.box(vel_count1, x='count', y='release_speed', color='count', title='')
-            fig_vc1.update_layout(
-                template="plotly_dark", 
-                height=400, 
-                showlegend=False,
-                plot_bgcolor='#111827',
-                paper_bgcolor='#0a0e17',
-                font=dict(family='system-ui', size=11, color='#e2e8f0'),
-                xaxis=dict(gridcolor='#1a202c', zeroline=False),
-                yaxis=dict(gridcolor='#1a202c', zeroline=False)
-            )
-            st.plotly_chart(fig_vc1, use_container_width=True, key="comp_vc1")
-        else:
-            st.info("No data")
-    
-    with col2:
-        st.markdown(f'<div style="margin-bottom: 0.75rem; color: #e2e8f0; font-weight: 600;">{pitcher_2}</div>', unsafe_allow_html=True)
-        vel_count2 = filtered_df_pitcher2[filtered_df_pitcher2['release_speed'] > 0].copy()
-        vel_count2['count'] = vel_count2['balls'].astype(str) + '-' + vel_count2['strikes'].astype(str)
-        
-        if len(vel_count2) > 0:
-            fig_vc2 = px.box(vel_count2, x='count', y='release_speed', color='count', title='')
-            fig_vc2.update_layout(
-                template="plotly_dark", 
-                height=400, 
-                showlegend=False,
-                plot_bgcolor='#111827',
-                paper_bgcolor='#0a0e17',
-                font=dict(family='system-ui', size=11, color='#e2e8f0'),
-                xaxis=dict(gridcolor='#1a202c', zeroline=False),
-                yaxis=dict(gridcolor='#1a202c', zeroline=False)
-            )
-            st.plotly_chart(fig_vc2, use_container_width=True, key="comp_vc2")
-        else:
-            st.info("No data")
-    
-    st.divider()
-    
-    # PITCH TYPE DISTRIBUTION
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown(f"**{selected_pitcher}** - Pitch Type Distribution")
-        pitch_dist1 = filtered_df_with_hand['pitch_type'].value_counts().reset_index()
-        pitch_dist1.columns = ['Pitch Type', 'Count']
-        
-        if len(pitch_dist1) > 0:
-            fig_pd1 = px.pie(pitch_dist1, values='Count', names='Pitch Type', title='')
-            fig_pd1.update_layout(template="plotly_dark", height=400)
-            st.plotly_chart(fig_pd1, use_container_width=True, key="comp_pd1")
-        else:
-            st.info("No data")
-    
-    with col2:
-        st.markdown(f"**{pitcher_2}** - Pitch Type Distribution")
-        pitch_dist2 = filtered_df_pitcher2['pitch_type'].value_counts().reset_index()
-        pitch_dist2.columns = ['Pitch Type', 'Count']
-        
-        if len(pitch_dist2) > 0:
-            fig_pd2 = px.pie(pitch_dist2, values='Count', names='Pitch Type', title='')
-            fig_pd2.update_layout(template="plotly_dark", height=400)
-            st.plotly_chart(fig_pd2, use_container_width=True, key="comp_pd2")
-        else:
-            st.info("No data")
-    
-    st.divider()
-    
-    # VELOCITY DISTRIBUTION
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown(f"**{selected_pitcher}** - Velocity by Pitch Type")
-        vel_df1 = filtered_df_with_hand[filtered_df_with_hand['release_speed'] > 0]
-        
-        if len(vel_df1) > 0:
-            fig_vel1 = px.box(vel_df1, x='pitch_type', y='release_speed', color='pitch_type', title='')
-            fig_vel1.update_layout(template="plotly_dark", height=400, showlegend=False)
-            st.plotly_chart(fig_vel1, use_container_width=True, key="comp_vel1")
-        else:
-            st.info("No data")
-    
-    with col2:
-        st.markdown(f"**{pitcher_2}** - Velocity by Pitch Type")
-        vel_df2 = filtered_df_pitcher2[filtered_df_pitcher2['release_speed'] > 0]
-        
-        if len(vel_df2) > 0:
-            fig_vel2 = px.box(vel_df2, x='pitch_type', y='release_speed', color='pitch_type', title='')
-            fig_vel2.update_layout(template="plotly_dark", height=400, showlegend=False)
-            st.plotly_chart(fig_vel2, use_container_width=True, key="comp_vel2")
-        else:
-            st.info("No data")
-    
-    st.divider()
-    
-    # SPIN RATE DISTRIBUTION
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown(f"**{selected_pitcher}** - Spin Rate by Pitch Type")
-        spin_df1 = filtered_df_with_hand[filtered_df_with_hand['release_spin_rate'] > 0]
-        
-        if len(spin_df1) > 0:
-            fig_spin1 = px.box(spin_df1, x='pitch_type', y='release_spin_rate', color='pitch_type', title='')
-            fig_spin1.update_layout(template="plotly_dark", height=400, showlegend=False)
-            st.plotly_chart(fig_spin1, use_container_width=True, key="comp_spin1")
-        else:
-            st.info("No data")
-    
-    with col2:
-        st.markdown(f"**{pitcher_2}** - Spin Rate by Pitch Type")
-        spin_df2 = filtered_df_pitcher2[filtered_df_pitcher2['release_spin_rate'] > 0]
-        
-        if len(spin_df2) > 0:
-            fig_spin2 = px.box(spin_df2, x='pitch_type', y='release_spin_rate', color='pitch_type', title='')
-            fig_spin2.update_layout(template="plotly_dark", height=400, showlegend=False)
-            st.plotly_chart(fig_spin2, use_container_width=True, key="comp_spin2")
-        else:
-            st.info("No data")
-    
-    st.divider()
-    
-    # MOVEMENT
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown(f"**{selected_pitcher}** - Movement (pfx)")
-        move_df1 = filtered_df_with_hand[(filtered_df_with_hand['pfx_x'].notna()) & (filtered_df_with_hand['pfx_z'].notna())]
-        
-        if len(move_df1) > 0:
-            fig_move1 = px.scatter(move_df1, x='pfx_x', y='pfx_z', color='pitch_type', title='',
-                                   labels={'pfx_x': 'Horizontal (in)', 'pfx_z': 'Vertical (in)'})
-            fig_move1.update_layout(template="plotly_dark", height=400)
-            fig_move1.update_xaxes(zeroline=True)
-            fig_move1.update_yaxes(zeroline=True)
-            st.plotly_chart(fig_move1, use_container_width=True, key="comp_move1")
-        else:
-            st.info("No data")
-    
-    with col2:
-        st.markdown(f"**{pitcher_2}** - Movement (pfx)")
-        move_df2 = filtered_df_pitcher2[(filtered_df_pitcher2['pfx_x'].notna()) & (filtered_df_pitcher2['pfx_z'].notna())]
-        
-        if len(move_df2) > 0:
-            fig_move2 = px.scatter(move_df2, x='pfx_x', y='pfx_z', color='pitch_type', title='',
-                                   labels={'pfx_x': 'Horizontal (in)', 'pfx_z': 'Vertical (in)'})
-            fig_move2.update_layout(template="plotly_dark", height=400)
-            fig_move2.update_xaxes(zeroline=True)
-            fig_move2.update_yaxes(zeroline=True)
-            st.plotly_chart(fig_move2, use_container_width=True, key="comp_move2")
-        else:
-            st.info("No data")
     
     st.divider()
 
