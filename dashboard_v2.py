@@ -214,12 +214,13 @@ def load_data():
     # Fetch from Google Drive
     df = pd.read_csv(f"https://drive.google.com/uc?id={statcast_id}")
     batter_names = pd.read_csv(f"https://drive.google.com/uc?id={batter_id}")
+    
+    # Create batter mapping (batter_id -> batter_name)
     batter_map = dict(zip(batter_names['batter_id'], batter_names['batter_name']))
     
     # Clean and prepare data
-    # Handle both 'batter' and 'batter_id' column names
-    batter_col = 'batter' if 'batter' in df.columns else 'batter_id'
-    df['batter_name'] = df[batter_col].apply(lambda x: batter_map.get(int(x), 'Unknown') if pd.notna(x) else 'Unknown')
+    # Map batter IDs to names
+    df['batter_name'] = df['batter'].apply(lambda x: batter_map.get(int(x), 'Unknown') if pd.notna(x) else 'Unknown')
     df['pitcher_name'] = df['player_name'].fillna('Unknown')
     df['game_date'] = pd.to_datetime(df['game_date'])
     
