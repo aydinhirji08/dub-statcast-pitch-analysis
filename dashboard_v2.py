@@ -3,8 +3,11 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-from collections import defaultdict
 import warnings
+import gdown
+import tempfile
+import os
+
 warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="MLB Statcast Pitch Analysis", layout="wide", initial_sidebar_state="expanded")
@@ -100,68 +103,6 @@ st.markdown("""
         margin: 1rem 0;
     }
     
-    /* Input Elements */
-    [data-testid="stSidebar"] .stSelectbox, 
-    [data-testid="stSidebar"] .stMultiSelect,
-    [data-testid="stSidebar"] .stSlider,
-    [data-testid="stSidebar"] .stRadio {
-        margin-bottom: 1rem;
-    }
-    
-    [data-testid="stSidebar"] .stSelectbox > div > div {
-        background-color: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        border-radius: 0.375rem;
-    }
-    
-    [data-testid="stSidebar"] input {
-        background-color: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        color: var(--text-primary);
-        border-radius: 0.375rem;
-    }
-    
-    [data-testid="stSidebar"] input:hover {
-        border-color: var(--accent-blue);
-    }
-    
-    [data-testid="stSidebar"] input:focus {
-        border-color: var(--accent-blue);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    /* Radio & Checkbox */
-    [data-testid="stSidebar"] .stRadio > div {
-        gap: 1rem;
-    }
-    
-    /* Sliders */
-    [data-testid="stSidebar"] .stSlider > div > div > div {
-        background-color: var(--accent-blue);
-    }
-    
-    /* Metric Cards */
-    .stMetric {
-        background-color: var(--bg-tertiary);
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border: 1px solid var(--border-color);
-    }
-    
-    .stMetric label {
-        color: var(--text-muted);
-        font-size: 0.875rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-    
-    .stMetric .metric-value {
-        color: var(--accent-blue);
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    
     /* Dividers */
     hr {
         border-color: var(--border-color);
@@ -187,11 +128,6 @@ st.markdown("""
         color: var(--text-primary);
     }
     
-    /* Markdown text styling */
-    .markdown-text-container {
-        color: var(--text-primary);
-    }
-    
     /* Links */
     a {
         color: var(--accent-blue);
@@ -204,22 +140,30 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Load data from Google Drive
+# Load data from Google Drive using gdown
 @st.cache_data
 def load_data():
     # Google Drive FILE IDs
     statcast_id = "1jxHScV07VtIvLjqZrct5zBJQYDnBwYKj"
     batter_id = "15sCrSvg_b1_pW8piY6PNhoCpBhs529ra"
     
-    # Fetch from Google Drive
-    df = pd.read_csv(f"https://drive.google.com/uc?id={statcast_id}")
-    batter_names = pd.read_csv(f"https://drive.google.com/uc?id={batter_id}")
+    # Download from Google Drive using gdown (handles large files)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        statcast_path = os.path.join(tmpdir, 'statcast.csv')
+        batter_path = os.path.join(tmpdir, 'batter.csv')
+        
+        # Download files with gdown
+        gdown.download(f'https://drive.google.com/uc?id={statcast_id}', statcast_path, quiet=True)
+        gdown.download(f'https://drive.google.com/uc?id={batter_id}', batter_path, quiet=True)
+        
+        # Read CSVs
+        df = pd.read_csv(statcast_path)
+        batter_names = pd.read_csv(batter_path)
     
     # Create batter mapping (batter_id -> batter_name)
     batter_map = dict(zip(batter_names['batter_id'], batter_names['batter_name']))
     
     # Clean and prepare data
-    # Map batter IDs to names
     df['batter_name'] = df['batter'].apply(lambda x: batter_map.get(int(x), 'Unknown') if pd.notna(x) else 'Unknown')
     df['pitcher_name'] = df['player_name'].fillna('Unknown')
     df['game_date'] = pd.to_datetime(df['game_date'])
