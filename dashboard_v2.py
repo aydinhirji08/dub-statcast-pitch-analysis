@@ -49,7 +49,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data
+@st.cache_resource
 def load_data():
     statcast_id = "1jxHScV07VtIvLjqZrct5zBJQYDnBwYKj"
     batter_id = "15sCrSvg_b1_pW8piY6PNhoCpBhs529ra"
